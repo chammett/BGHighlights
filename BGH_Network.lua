@@ -4,12 +4,11 @@ local addonName, BGH = ...
 -- 6.1. VERSION CONTROL & NETWORK ENFORCER
 -- ==========================================
 
--- SHIFT TO NAMESPACE: Global State tracking flags
 BGH.IsKillSwitched = false
 BGH.InspectCache = BGH.InspectCache or {}
 
 local highestKnownVersion = BGH.VERSION_CODE
-local CACHE_DURATION = 180 -- seconds
+local CACHE_DURATION = 180
 
 -- Visual Alert Utility for the Outdated User
 local function TriggerVersionAlert(latestStr)
@@ -22,7 +21,6 @@ local function TriggerVersionAlert(latestStr)
         RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000[BGH Outdated] Medal Processing Frozen! Please Update!|r", ChatTypeInfo["RAID_WARNING"])
     end
     
-    -- SHIFT TO NAMESPACE: Pull the UI frame from UI.lua
     if BGH.BGHighlightsUpdatePopup then
         BGH.BGHighlightsUpdatePopup:Show()
     end
@@ -42,7 +40,6 @@ local function BroadcastLocalVersion()
     if IsInInstance() then
         local _, instanceType = IsInInstance()
         if instanceType == "pvp" then
-            -- SHIFT TO NAMESPACE: Pulls version and checksum from Init.lua
             local payload = BGH.VERSION_CODE .. ":" .. BGH.VERSION_STR
             local signature = BGH.GenerateChecksum(payload)
             
@@ -111,7 +108,7 @@ local function SerializeMedals()
     for i = 1, lastNonZero do table.insert(compressedParts, parts[i]) end
     local medalPayload = table.concat(compressedParts, ":")
 
-    -- NEW: Serialize Lifetime Stats
+    -- Serialize Lifetime Stats
     local lts = (BGHL_LifetimeStats and BGHL_LifetimeStats.Overall) or {}
     local m = lts.highestMinor or {}
     local lifetimePayload = string.format("%d,%d,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%d,%d,%d,%d",
@@ -142,7 +139,7 @@ local function DeserializeMedals(payload)
         end
     end
 
-    -- NEW: Deserialize Lifetime Stats
+    -- Deserialize Lifetime Stats
     local parsedLifetime = {}
     if lifetimePayload then
         local mp, tm, sm, so, sw, hm, ho, hw, hmed, swd, cup, wnd, coi = strsplit(",", lifetimePayload)
@@ -258,7 +255,6 @@ function BGHL_OnInspectDataReceived(playerName, data)
     BGHInspectFrame.fallbackText:Hide()
 	BGHInspectFrame.pageFrame:Show()
     
-	-- Dynamically hide old inspect stats to prevent data bleed between targets
     local poolIndex = 100
     while BGH.MedalFramePool[poolIndex] do
         BGH.MedalFramePool[poolIndex]:Hide()
@@ -306,7 +302,7 @@ function BGHL_OnInspectDataReceived(playerName, data)
         end
     end
 
-    -- 2. Populate Lifetime Stats
+    -- 3. Populate Lifetime Stats
     local lts = data.lifetime
     if lts then
         local matches = lts.matchesPlayed or 0
@@ -372,7 +368,6 @@ function BGHL_OnInspectDataReceived(playerName, data)
         BGHInspectFrame.statsScrollFrame:UpdateScrollChildRect()
     end
     
-    -- Reset to page 1 to ensure a clean slate when clicking on a new target
     BGHInspectFrame.currentPage = 1
     BGHInspectFrame.UpdatePage()
 end
@@ -440,7 +435,6 @@ local function InitializeInspectArcanaTab()
     BGHInspectFrame.scrollChild:SetSize(300, 620) 
     BGHInspectFrame.scrollFrame:SetPoint("TOPLEFT", BGHInspectFrame, "TOPLEFT", 2, 0)
 
-    -- Create the new container for Lifetime Stats
     BGHInspectFrame.statsScrollFrame = CreateFrame("ScrollFrame", "BGHInspectStatsScrollFrame", BGHInspectFrame, "UIPanelScrollFrameTemplate")
     BGHInspectFrame.statsScrollFrame:SetPoint("TOPLEFT", BGHInspectFrame, "TOPLEFT", 2, 0) 
     BGHInspectFrame.statsScrollFrame:SetPoint("BOTTOMRIGHT", BGHInspectFrame, "BOTTOMRIGHT", -22, 2)
@@ -450,7 +444,6 @@ local function InitializeInspectArcanaTab()
     BGHInspectFrame.statsScrollChild:SetSize(300, 600)
     BGHInspectFrame.statsScrollFrame:SetScrollChild(BGHInspectFrame.statsScrollChild)
 
-    -- Build the Pagination Frame
     BGHInspectFrame.pageFrame = CreateFrame("Frame", nil, BGHInspectFrame)
     BGHInspectFrame.pageFrame:SetSize(300, 25)
     BGHInspectFrame.pageFrame:SetPoint("BOTTOM", BGHInspectFrame, "TOP", 0, 2)
@@ -476,13 +469,13 @@ local function InitializeInspectArcanaTab()
             BGHInspectFrame.pageText:SetText("Arcana Collection")
             BGHInspectFrame.statsScrollFrame:Hide()
             BGHInspectFrame.scrollFrame:Show()
-            BGHInspectFrame.bg:Show() -- Show spread_bg texture
+            BGHInspectFrame.bg:Show()
             BGHInspectFrame.btnPrev:SetEnabled(false)
             BGHInspectFrame.btnNext:SetEnabled(true)
         else
             BGHInspectFrame.pageText:SetText("   Lifetime Stats   ")
             BGHInspectFrame.scrollFrame:Hide()
-            BGHInspectFrame.bg:Hide() -- Reveal native parchment
+            BGHInspectFrame.bg:Hide()
             BGHInspectFrame.statsScrollFrame:Show()
             BGHInspectFrame.btnPrev:SetEnabled(true)
             BGHInspectFrame.btnNext:SetEnabled(false)
@@ -499,46 +492,42 @@ local function InitializeInspectArcanaTab()
     local scrollBar = _G[scrollFrameName .. "ScrollBar"]
     if not scrollBar then return end
 
-    -- 1. Shift the entire scrollbar track UP to align with the frame's top edge
     scrollBar:ClearAllPoints()
     scrollBar:SetPoint("TOPLEFT", scrollFrame, "TOPRIGHT", 6, -14)
     scrollBar:SetPoint("BOTTOMLEFT", scrollFrame, "BOTTOMRIGHT", 6, 12)
 
-    -- 2. Hide Blizzard's default border textures to prevent visual bleeding
     for _, texName in ipairs({"Top", "Bottom", "Middle"}) do
         local bgTex = _G[scrollFrameName .. "ScrollBar" .. texName]
         if bgTex then bgTex:Hide() end
     end
 
-    -- 3. Fix the Thumb Gap by shifting the buttons slightly inward over the track
     local upBtn = _G[scrollFrameName .. "ScrollBarScrollUpButton"]
     if upBtn then
         upBtn:ClearAllPoints()
-        upBtn:SetPoint("BOTTOM", scrollBar, "TOP", 0, -1) -- This pushes the top cap and button up and down
+        upBtn:SetPoint("BOTTOM", scrollBar, "TOP", 0, -1)
     end
 
     local downBtn = _G[scrollFrameName .. "ScrollBarScrollDownButton"]
     if downBtn then
         downBtn:ClearAllPoints()
-        downBtn:SetPoint("TOP", scrollBar, "BOTTOM", 0, 1) -- Pushes the bottom cap up and down
+        downBtn:SetPoint("TOP", scrollBar, "BOTTOM", 0, 1)
     end
 
-    -- 4. Anchor the custom parchment textures directly to the buttons so they wrap perfectly
     local trough = scrollBar:CreateTexture(nil, "BACKGROUND", nil, -1)
     trough:SetWidth(27)
-    trough:SetPoint("TOP", upBtn or scrollBar, "TOP", 0, 4) -- This pushes the background trough graphic up and down
+    trough:SetPoint("TOP", upBtn or scrollBar, "TOP", 0, 4)
     trough:SetPoint("BOTTOM", downBtn or scrollBar, "BOTTOM", 0, 0)
     trough:SetColorTexture(0, 0, 0, 0.9)
 
     local topTex = scrollBar:CreateTexture(nil, "BACKGROUND", nil, 0)
     topTex:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-ScrollBar")
     topTex:SetSize(30, 256)
-    topTex:SetPoint("TOPLEFT", upBtn or scrollBar, "TOPLEFT", -6, 4) -- This pushes the cap up without moving the button
+    topTex:SetPoint("TOPLEFT", upBtn or scrollBar, "TOPLEFT", -6, 4)
     topTex:SetTexCoord(0, 0.484375, 0, 1)
 
     local bottomTex = scrollBar:CreateTexture(nil, "BACKGROUND", nil, 0)
     bottomTex:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-ScrollBar")
-    bottomTex:SetSize(30, 106) -- Texture for the trough border
+    bottomTex:SetSize(30, 106)
     bottomTex:SetPoint("BOTTOMLEFT", downBtn or scrollBar, "BOTTOMLEFT", -6, -2)
     bottomTex:SetTexCoord(0.515625, 1.0, 0, 0.4140625)
 
@@ -550,7 +539,6 @@ local function InitializeInspectArcanaTab()
     middleTex:SetTexCoord(0, 0.484375, 0.75, 1) 
 end
 
-    -- Apply it to both frames
     SkinInspectScrollBar(BGHInspectFrame.scrollFrame:GetName())
     SkinInspectScrollBar(BGHInspectFrame.statsScrollFrame:GetName())
 
@@ -623,7 +611,6 @@ end
         table.insert(inspectGridButtons, iconButton)
     end
 
-    -- MINOR ARCANA HEADER (Inspect Tab)
     local minorHeader = BGHInspectFrame.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     minorHeader:SetPoint("TOP", BGHInspectFrame.scrollChild, "TOPLEFT", 148, lastY - 60)
     minorHeader:SetText("Minor Arcana")

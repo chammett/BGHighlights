@@ -4,7 +4,6 @@ local addonName, BGH = ...
 -- 5.1. MAIN FRAME (The Wall)
 -- ==========================================
 
--- SHIFT TO NAMESPACE: Expose arrays to the Tarot engine
 BGH.activeMedalFrames = {}
 BGH.MedalFramePool = {}
 
@@ -14,7 +13,6 @@ BGFrame:SetPoint("CENTER", UIParent, "CENTER")
 BGFrame:SetFrameStrata("HIGH")
 BGFrame:Hide()
 
--- SHIFT TO NAMESPACE: Allow Core to toggle the main UI
 BGH.BGFrame = BGFrame
 
 table.insert(UISpecialFrames, "BGHighlightsMainFrame") 
@@ -133,7 +131,6 @@ end
 function BGFrame:RenderLifetimeStats()
     if type(BGHL_LifetimeStats) ~= "table" then return end
     
-    -- LAZY INITIALIZATION: Only build the frame when we know the scrollChild exists!
     if not mapDropdown then
         mapDropdown = CreateFrame("Frame", "BGHLifetimeMapDropdown", BGH.scrollChild, "UIDropDownMenuTemplate")
         UIDropDownMenu_SetWidth(mapDropdown, 160)
@@ -141,8 +138,8 @@ function BGFrame:RenderLifetimeStats()
         UIDropDownMenu_Initialize(mapDropdown, MapDropdown_Initialize)
 		mapDropdown.point = "TOPLEFT"
         mapDropdown.relativePoint = "BOTTOMLEFT"
-        mapDropdown.xOffset = 40  -- Pushes the list past the invisible left margin
-        mapDropdown.yOffset = 25   -- Tucks the list neatly under the dropdown bar
+        mapDropdown.xOffset = 40 
+        mapDropdown.yOffset = 25
     end
     
     mapDropdown:SetPoint("TOP", BGH.scrollChild, "TOP", 30, -5)
@@ -163,7 +160,7 @@ function BGFrame:RenderLifetimeStats()
     local avgObj = matches > 0 and (lts.sumObjectives or 0) / matches or 0
     local avgWeight = matches > 0 and (lts.sumWeight or 0) / matches or 0
 
-    local currentY = -45 -- Push down to clear the dropdown
+    local currentY = -45
     local poolIndex = 1
 
     local function AddStatRow(title, desc, icon, colorCode)
@@ -334,7 +331,6 @@ BGHUpdateFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 100)
 BGHUpdateFrame:SetFrameStrata("DIALOG")
 BGHUpdateFrame:Hide()
 
--- SHIFT TO NAMESPACE: Network.lua needs to call this if versions mismatch
 BGH.BGHighlightsUpdatePopup = BGHUpdateFrame
 
 BGHUpdateFrame:SetBackdrop({
@@ -542,7 +538,6 @@ infoText:SetPoint("TOPLEFT", infoScrollChild, "TOPLEFT", 10, -10)
 infoText:SetWidth(250)
 infoText:SetJustifyH("LEFT")
 
--- SHIFT TO NAMESPACE: Safely pull the scoring weights defined in Tarot.lua
 local sW = BGH.ScoringWeights or { drTaxPerMedal = 15, isolationMult = 1.0, attritionMult = 5.0, vanguardMult = 0.5, triageDivisor = 1.0 }
 
 local infoTextStr = string.format([[
@@ -690,7 +685,7 @@ local function CreateCopyBox(parent, labelText, url, yOffset)
 end
 
 local paypalBox = CreateCopyBox(devFrame, "Buy me a Coffee (PayPal):", "https://paypal.me/chrishammett1992", -220)
-local githubBox = CreateCopyBox(devFrame, "Public GitHub Repository:", "https://github.com/Placeholder/BGHighlights", -280)
+local githubBox = CreateCopyBox(devFrame, "Public GitHub Repository:", "https://github.com/chammett/BGHighlights", -280)
 
 local spreadBackground = BGFrame:CreateTexture(nil, "ARTWORK")
 spreadBackground:SetDrawLayer("ARTWORK", 1) 
@@ -1016,7 +1011,6 @@ function BGH.UpdateOrCreateMedalRow(index, parent, medal, rankColor)
         fadeIn:SetFromAlpha(0.15); fadeIn:SetToAlpha(0.65); fadeIn:SetDuration(1.5); fadeIn:SetOrder(2)
         medalFrame.glow.animGroup = animGroup
 
-        -- One-Shot Socketing Animation
         local socketAnim = medalFrame.glow:CreateAnimationGroup()
         socketAnim:SetLooping("NONE")
         local socketFade = socketAnim:CreateAnimation("Alpha")
@@ -1024,7 +1018,6 @@ function BGH.UpdateOrCreateMedalRow(index, parent, medal, rankColor)
         socketFade:SetToAlpha(0.0)
         socketFade:SetDuration(1.5)
         socketFade:SetOrder(1)
-        -- Hide the glow texture entirely when the animation finishes
         socketAnim:SetScript("OnFinished", function() medalFrame.glow:Hide() end)
         medalFrame.socketAnim = socketAnim
 

@@ -62,7 +62,7 @@ SlashCmdList["BGHTEST"] = function()
         if BGH.BGFrame.ClearMedalsUI then BGH.BGFrame:ClearMedalsUI() end
     end
     
-    -- 2. Trigger the reveal simulation (isEndOfMatch = false, isTestReveal = true)
+    -- 2. Trigger the reveal simulation
     if BGH.RenderMedals then
         BGH.RenderMedals(matchData, false, true)
     end
@@ -87,7 +87,6 @@ local function ParseScoreboard()
     for i = 1, numScores do
         local name, kb, hk, deaths, honor, faction, _, _, _, classToken, dmg, heal = GetBattlefieldScore(i)
         if name then
-            -- Map the base name to the full server ID for chat parsing
             local baseName = strsplit("-", name)
             BGHL_NameMap[baseName] = name 
             
@@ -157,13 +156,11 @@ local function DeepCopy(orig)
 end
 
 local function EvaluateTarotMedals()
-    -- SHIFT TO NAMESPACE: Required so Network.lua can access it
     if type(BGH.InspectCache) == "table" then wipe(BGH.InspectCache) else BGH.InspectCache = {} end
     
     BGHL_MatchData.MapName = GetRealZoneText()
     print("|cff00ccff[BGHighlights]: Match ended! The scales of fate are balancing...|r")
     
-    -- SHIFT TO NAMESPACE: Call the Math Engine in Tarot.lua
     if BGH.RenderMedals then BGH.RenderMedals(BGHL_MatchData, true) end
     
     local evaluatedCopy = {}

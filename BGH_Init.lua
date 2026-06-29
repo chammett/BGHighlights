@@ -26,7 +26,6 @@ BGH.VERSION_CODE = ParseVersionString(BGH_VERSION_STR)
 -- ==========================================
 local SECRET_SALT = "Tranquility_OIT_2026!" 
 
--- SHIFT TO NAMESPACE: Network.lua needs this for packet signing
 function BGH.GenerateChecksum(payload)
     local combined = payload .. SECRET_SALT
     local hash = 5381
@@ -40,12 +39,10 @@ function BGH.GenerateChecksum(payload)
     return tostring(hash)
 end
 
--- SHIFT TO NAMESPACE: Tarot.lua calls this after a match ends
 function BGH.SealDatabase()
     if type(BGHL_PlayerMedals) ~= "table" then return end
     
     local dataString = ""
-    -- SHIFT TO NAMESPACE: MedalRegistry will live in Tarot.lua
     for _, medal in ipairs(BGH.MedalRegistry) do
         local count = 0
         local earnedData = BGHL_PlayerMedals[medal.title]
@@ -164,7 +161,6 @@ MigrationEngine:SetScript("OnEvent", function(self)
         WorldStateScoreFrame:EnableMouse(true)
         WorldStateScoreFrame:RegisterForDrag("LeftButton")
         
-        -- Use HookScript instead of SetScript to safely preserve native Blizzard code
         WorldStateScoreFrame:HookScript("OnDragStart", WorldStateScoreFrame.StartMoving)
         WorldStateScoreFrame:HookScript("OnDragStop", WorldStateScoreFrame.StopMovingOrSizing)
     end

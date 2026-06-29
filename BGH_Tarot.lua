@@ -3,6 +3,7 @@ local addonName, BGH = ...
 -- ==========================================
 -- 3.1. MASTER REGISTRY (The Deck)
 -- ==========================================
+-- Major Arcana Deck
 local BGHL_MedalRegistry = {
     { 
         title = "The Fool", icon = "Interface\\Icons\\Spell_Shadow_MindSteal", 
@@ -116,7 +117,6 @@ local BGHL_MedalRegistry = {
     }
 }
 
--- SHIFT TO NAMESPACE: Init.lua uses this for sealing the DB
 BGH.MedalRegistry = BGHL_MedalRegistry
 
 -- Minor Arcana Deck
@@ -156,7 +156,6 @@ local BGHL_ScoringWeights = {
     drTaxPerMedal = 15        -- Percentage weight reduction for holding multiple medals
 }
 
--- SHIFT TO NAMESPACE: UI.lua uses this for generating the Legend Text
 BGH.ScoringWeights = BGHL_ScoringWeights
 
 -- ==========================================
@@ -165,7 +164,6 @@ BGH.ScoringWeights = BGHL_ScoringWeights
 function BGH.RenderMedals(dataMatrix, isEndOfMatch, isTestReveal)
     if type(dataMatrix) ~= "table" then return end
 
-    -- Build the Collision Map
     local nameCounts = {}
     local playerCount = 0
     for playerName, stats in pairs(dataMatrix) do
@@ -574,7 +572,6 @@ function BGH.RenderMedals(dataMatrix, isEndOfMatch, isTestReveal)
 
     if isEndOfMatch and not isTestReveal then
 	
-        -- SHIFT TO NAMESPACE: Checks the network state set by Network.lua
         if BGH.IsKillSwitched then
             print("|cffff0000[BGH Network]: Medal tracking suppressed for this match. You must update your client layout!|r")
             return 
@@ -634,10 +631,8 @@ function BGH.RenderMedals(dataMatrix, isEndOfMatch, isTestReveal)
             end
         end
         
-        -- SHIFT TO NAMESPACE: Init.lua functionality
         BGH.SealDatabase()
         
-        -- SHIFT TO NAMESPACE: UI.lua functionality
         if BGH.UpdateArcanaUI then BGH.UpdateArcanaUI() end
 		
         if highestPlayerMedal then
@@ -663,7 +658,6 @@ function BGH.RenderMedals(dataMatrix, isEndOfMatch, isTestReveal)
         end
     end
 
-    -- SHIFT TO NAMESPACE: UI.lua functionality
     if BGH.BGFrame then BGH.BGFrame:ClearMedalsUI() end
 
 	-- ==========================================
@@ -681,18 +675,15 @@ function BGH.RenderMedals(dataMatrix, isEndOfMatch, isTestReveal)
             rankColor = "LEGENDARY"
         end
 		
-		-- SHIFT TO NAMESPACE: Generating UI from Tarot Engine
 		if BGH.UpdateOrCreateMedalRow and BGH.scrollChild then
             local frame = BGH.UpdateOrCreateMedalRow(i, BGH.scrollChild, medal, rankColor)
             frame:SetPoint("TOP", BGH.scrollChild, "TOP", 25, currentY)
             currentY = currentY - frame:GetHeight() - 10
             table.insert(BGH.activeMedalFrames, frame)
 
-            -- Standard pacing (+0.75s)
             currentDelay = currentDelay + 0.75
             local revealTime = currentDelay
 
-            -- The Reveal: Staggered delay with Audio Cues & Socketing
             if isEndOfMatch or isTestReveal then
                 frame:Hide()
                 C_Timer.After(revealTime, function()
@@ -707,7 +698,6 @@ function BGH.RenderMedals(dataMatrix, isEndOfMatch, isTestReveal)
                             PlaySoundFile(562732, "Master")
                         end
                         
-                        -- Trigger socketing flash for all non-legendary medals
                         if rankColor ~= "LEGENDARY" and frame.glow and frame.socketAnim then
                             frame.glow:Show()
                             frame.socketAnim:Play()
@@ -715,7 +705,6 @@ function BGH.RenderMedals(dataMatrix, isEndOfMatch, isTestReveal)
                     end
                 end)
                 
-                -- The Padding: Add an extra 750ms wait time AFTER a Legendary drops
                 if rankColor == "LEGENDARY" then
                     currentDelay = currentDelay + 0.75
                 end
@@ -759,7 +748,6 @@ function BGH.RenderMedals(dataMatrix, isEndOfMatch, isTestReveal)
         currentY = currentY - myFrame:GetHeight() - 10
         table.insert(BGH.activeMedalFrames, myFrame)
 
-        -- The Reveal: Trigger at the very end of our dynamic delay + one last tick
         if isEndOfMatch or isTestReveal then
             myFrame:Hide()
             C_Timer.After(currentDelay + 0.75, function()

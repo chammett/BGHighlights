@@ -73,7 +73,6 @@ function BGH.GetMinorArcanaCards(swords, cups, wands, coins)
             local multiplierStr = string.format("%.1fx", 1.0 + (data.tier * 0.1))
             local reason = string.format("Drew the %s for generating over %s average %s", cardName, multiplierStr, data.desc)
             
-            -- INTERNAL HOOK: Now explicitly targets the shared namespace
             local buff = BGH.CalculateMinorBonus(data.tier)
             
             table.insert(cards, { name = cardName, reason = reason, buff = buff })
@@ -81,7 +80,6 @@ function BGH.GetMinorArcanaCards(swords, cups, wands, coins)
         end
     end
     
-    -- Sort cards descending by buff strength to look nice in the tooltip
     table.sort(cards, function(a, b) return a.buff > b.buff end)
     
     return cards, totalBuff
