@@ -1,9 +1,9 @@
 # BGHighlights (BGH)
 **The Scales of Fate are Balancing...**
 
-BGHighlights is a competitive, stat-driven, Tarot-themed post-match highlight AddOn for World of Warcraft PvP. Instead of relying on raw, easily-padded numbers, BGHighlights uses statistical analysis (Z-Scores) to compare your performance directly against the lobby average. At the end of a Battleground, the Tarot evaluates the lobby and awards "Arcana" to the players who genuinely impacted the match.
+BGHighlights is a competitive, stat-driven, Tarot-themed post-match highlight AddOn for World of Warcraft PvP (TBC Anniversary 2.5.5). Instead of relying on raw, easily-padded numbers, BGHighlights uses statistical analysis (Z-Scores) to compare your performance directly against the lobby average. At the end of a Battleground, the Tarot evaluates the lobby and awards "Arcana" to the players who genuinely impacted the match.
 
-Whether you are solitary defender holding a node, a vanguard healer pushing the frontline, or an objective-focused flag runner, the Tarot sees your contribution. 
+Whether you are a solitary defender holding a node, a vanguard healer pushing the frontline, or an objective-focused flag runner, the Tarot sees your contribution. 
 
 ## 🔮 Key Features
 
