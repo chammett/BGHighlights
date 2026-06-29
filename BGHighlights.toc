@@ -1,4 +1,4 @@
-## Interface: 25200
+## Interface: 20505
 ## Title: BGHighlights
 ## Notes: Post-match Tarot Arcana and statistical highlights for Battlegrounds.
 ## Author: Chris Hammett
