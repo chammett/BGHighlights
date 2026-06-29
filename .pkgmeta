@@ -1,0 +1,7 @@
+package-as: BGHighlights
+
+ignore:
+  - .github
+  - README.md
+  - .gitignore
+  # Add any other folders/images here (like your raw photoshop files or test screenshots)
