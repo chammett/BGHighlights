@@ -1,5 +1,5 @@
 package-as: BGHighlights
-project-id: 1591652
+curse-project-id: 1591652
 
 ignore:
   - .github
