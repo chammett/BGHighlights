@@ -1,0 +1,15 @@
+## Interface: 25200
+## Title: BGHighlights
+## Notes: Post-match Tarot Arcana and statistical highlights for Battlegrounds.
+## Author: Chris Hammett
+## Version: @project-version@
+## SavedVariables: BGHL_Settings
+## SavedVariablesPerCharacter: BGHL_PlayerMedals, BGHL_LastMatchData, BGHL_MatchHistory, BGHL_LifetimeStats
+## IconTexture: Interface\Icons\INV_Misc_Ticket_Tarot_Maelstrom_01
+
+BGH_Init.lua
+BGH_Math.lua
+BGH_Tarot.lua
+BGH_Core.lua
+BGH_UI.lua
+BGH_Network.lua
