@@ -3,6 +3,7 @@
 ## Notes: Post-match Tarot Arcana and statistical highlights for Battlegrounds.
 ## Author: Chris Hammett
 ## Version: @project-version@
+## X-Curse-Project-ID: 1591652
 ## SavedVariables: BGHL_Settings
 ## SavedVariablesPerCharacter: BGHL_PlayerMedals, BGHL_LastMatchData, BGHL_MatchHistory, BGHL_LifetimeStats
 ## IconTexture: Interface\Icons\INV_Misc_Ticket_Tarot_Maelstrom_01
