@@ -14,7 +14,7 @@ local CACHE_DURATION = 180
 local function TriggerVersionAlert(latestStr)
     print("|cffff0000==================================================|r")
     print("|cffff0000[BGH CRITICAL ALERT]: Your version of BGHighlights is outdated!|r")
-    print(string.format("|cffffffffActive Match Medal generation has been disabled. Please update to |cff00ff00v%s|cffffffff.|r", latestStr))
+    print(string.format("|cffffffffActive Match Medal generation has been disabled. Please update to |cff00ff00%s|cffffffff.|r", latestStr))
     print("|cffff0000==================================================|r")
     
     if RaidNotice_AddMessage then
@@ -52,14 +52,31 @@ end
 local VersionWatcher = CreateFrame("Frame")
 VersionWatcher:RegisterEvent("PLAYER_LOGIN")
 VersionWatcher:RegisterEvent("PLAYER_ENTERING_WORLD")
+VersionWatcher:RegisterEvent("GROUP_ROSTER_UPDATE")
+
+local groupUpdateTimer = nil 
 
 VersionWatcher:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_LOGIN" then
-        C_Timer.After(3.0, function()
-            BroadcastLocalVersion()
+        -- Wait 4 seconds to ensure the client is fully populated and channel data is loaded
+        C_Timer.After(4.0, function()
+            local payload = BGH.VERSION_CODE .. ":" .. BGH.VERSION_STR
+            local signature = BGH.GenerateChecksum(payload)
+            
+            -- 1. Broadcast to Guild
             if IsInGuild() then
-                C_ChatInfo.SendAddonMessage("BGH", "V_REQ:" .. BGH.VERSION_CODE .. ":" .. BGH.VERSION_STR, "GUILD")
+                C_ChatInfo.SendAddonMessage("BGH", "V_REQ:" .. payload .. ":" .. signature, "GUILD")
             end
+            
+            -- 2. Broadcast to Party/Raid (Fixes the offline-login gap)
+            if IsInRaid() then
+                C_ChatInfo.SendAddonMessage("BGH", "V_REQ:" .. payload .. ":" .. signature, "RAID")
+            elseif IsInGroup() then
+                C_ChatInfo.SendAddonMessage("BGH", "V_REQ:" .. payload .. ":" .. signature, "PARTY")
+            end
+            
+            -- 3. Broadcast to PvP Instance (if loading directly into a Battleground)
+            BroadcastLocalVersion()
         end)
         
     elseif event == "PLAYER_ENTERING_WORLD" then
@@ -69,6 +86,20 @@ VersionWatcher:SetScript("OnEvent", function(self, event, ...)
                 BroadcastLocalVersion()
             end)
         end
+        
+    elseif event == "GROUP_ROSTER_UPDATE" then
+        if groupUpdateTimer and not groupUpdateTimer:IsCancelled() then return end
+        
+        groupUpdateTimer = C_Timer.NewTimer(3.0, function()
+            local payload = BGH.VERSION_CODE .. ":" .. BGH.VERSION_STR
+            local signature = BGH.GenerateChecksum(payload)
+            
+            if IsInRaid() then
+                C_ChatInfo.SendAddonMessage("BGH", "V_REQ:" .. payload .. ":" .. signature, "RAID")
+            elseif IsInGroup() then
+                C_ChatInfo.SendAddonMessage("BGH", "V_REQ:" .. payload .. ":" .. signature, "PARTY")
+            end
+        end)
     end
 end)
 
@@ -171,6 +202,12 @@ function BGHL_RequestInspectData(targetPlayer)
         return
     end
 
+    -- Ping the target with a Version Request before asking for data
+    local vPayload = BGH.VERSION_CODE .. ":" .. BGH.VERSION_STR
+    local vSignature = BGH.GenerateChecksum(vPayload)
+    C_ChatInfo.SendAddonMessage("BGH", "V_REQ:" .. vPayload .. ":" .. vSignature, "WHISPER", targetPlayer)
+
+    -- Existing data request
     C_ChatInfo.SendAddonMessage("BGH", "REQ", "WHISPER", targetPlayer)
 end
 

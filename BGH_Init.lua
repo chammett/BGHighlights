@@ -166,6 +166,6 @@ MigrationEngine:SetScript("OnEvent", function(self)
     end
 	
 	-- 5. Welcome Message Broadcast
-    print(string.format("|cff00ccff[BGHighlights]|r v%s by Isuira @ Dreamscyth loaded! Type |cffffff00/bgh|r or |cffffff00left-click|r the minimap icon to view your Arcana.", BGH.VERSION_STR))
+    print(string.format("|cff00ccff[BGHighlights]|r %s by Isuira @ Dreamscyth loaded! Type |cffffff00/bgh|r or |cffffff00left-click|r the minimap icon to view your Arcana.", BGH.VERSION_STR))
 	
 end)

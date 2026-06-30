@@ -1148,11 +1148,20 @@ function BGH.UpdateOrCreateMedalRow(index, parent, medal, rankColor)
     return medalFrame
 end
 
+-- ==========================================
+-- MEDAL ROW GENERATOR (Patch)
+-- ==========================================
 function BGFrame:ClearMedalsUI()
-    for _, frame in pairs(BGH.MedalFramePool) do
-        if frame then
+    -- 1. Only hide frames belonging to the main UI (Indices 1 through 99)
+    for index, frame in pairs(BGH.MedalFramePool) do
+        if frame and type(index) == "number" and index < 100 then
             frame:Hide()
         end
+    end
+    
+    -- 2. Prevent infinite array bloat by wiping the active frames table
+    if type(BGH.activeMedalFrames) == "table" then
+        wipe(BGH.activeMedalFrames)
     end
 end
 
